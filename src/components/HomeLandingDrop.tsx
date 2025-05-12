@@ -9,11 +9,36 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
-import Dropzone from "react-dropzone";
+import Dropzone, { Accept } from "react-dropzone";
 import HomepageImage1 from "./images/homepage-image-1";
 import HomepageImage2 from "./images/homepage-image-2";
 import { StatusApp } from "@/app/page";
 import { useToast } from "@/hooks/use-toast";
+import { useEffect, useState } from "react";
+
+// Helper function to truncate filename
+const truncateFilename = (filename: string, maxLength = 25) => {
+  if (filename.length <= maxLength) return filename;
+  
+  // Find the last dot to preserve extension
+  const lastDotIndex = filename.lastIndexOf(".");
+  if (lastDotIndex === -1) {
+    // No extension
+    return `${filename.substring(0, maxLength - 3)}...`;
+  }
+
+  const extension = filename.substring(lastDotIndex);
+  const nameWithoutExtension = filename.substring(0, lastDotIndex);
+  
+  // If name is too short, just add ...
+  if (nameWithoutExtension.length <= 10) {
+    return `${nameWithoutExtension.substring(0, 5)}...${extension}`;
+  }
+  
+  // Otherwise keep some chars from start and end
+  const charsToKeep = Math.floor((maxLength - 3 - extension.length) / 2);
+  return `${nameWithoutExtension.substring(0, charsToKeep)}...${nameWithoutExtension.substring(nameWithoutExtension.length - charsToKeep)}${extension}`;
+};
 
 export const HomeLandingDrop = ({
   status,
@@ -23,20 +48,64 @@ export const HomeLandingDrop = ({
 }: {
   status: StatusApp;
   file?: File | null;
-  setFile: (file: File | null) => void;
+  setFile: (file: File | undefined) => void;
   handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
 }) => {
   const { toast } = useToast();
+  const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
+
+  const acceptType: Accept = { 
+    "image/png": [".png"], 
+    "image/jpeg": [".jpg", ".jpeg"], 
+    "image/webp": [".webp"] 
+  };
+  const uploadLabel = "Upload Image";
+  const selectButtonText = "Select Image";
+  const headerText = "Describe Images";
+  const subHeaderText = "Upload an <strong>image</strong> to get an AI-generated description.";
+
+  useEffect(() => {
+    // Cleanup function to revoke the object URL
+    return () => {
+      if (imagePreviewUrl) {
+        URL.revokeObjectURL(imagePreviewUrl);
+      }
+    };
+  }, [imagePreviewUrl]);
+
+  const handleFileDrop = (acceptedFiles: File[]) => {
+    if (imagePreviewUrl) {
+      URL.revokeObjectURL(imagePreviewUrl);
+      setImagePreviewUrl(null);
+    }
+    const selectedFile = acceptedFiles[0];
+    if (selectedFile) {
+      if (selectedFile.size > 5 * 1024 * 1024) {
+        toast({
+          title: "📁 File Too Large",
+          description: "⚠️ File size must be less than 5MB",
+        });
+        setFile(undefined);
+        return;
+      }
+      setFile(selectedFile);
+      setImagePreviewUrl(URL.createObjectURL(selectedFile));
+    } else {
+      setFile(undefined);
+      if (imagePreviewUrl) {
+        URL.revokeObjectURL(imagePreviewUrl);
+        setImagePreviewUrl(null);
+      }
+    }
+  };
+
   return (
-    <div className="mx-auto mt-6 max-w-lg md:mt-10">
+    <div className="mx-auto mt-4 max-w-lg md:mt-10">
       <h1 className="text-center text-4xl font-bold md:text-5xl">
-        Summarize PDFs
+        {headerText}
         <br /> in seconds
       </h1>
-      <p className="mx-auto mt-6 max-w-md text-balance text-center leading-snug md:text-lg md:leading-snug">
-        Upload a <strong>PDF</strong> to get a quick, clear, and shareable
-        summary.
-      </p>
+      <p className="mx-auto mt-6 max-w-md text-balance text-center leading-snug md:text-lg md:leading-snug" dangerouslySetInnerHTML={{ __html: subHeaderText }} />
 
       <form
         onSubmit={handleSubmit}
@@ -52,64 +121,48 @@ export const HomeLandingDrop = ({
         <div className="relative">
           <div className="flex flex-col rounded-xl bg-white px-6 py-6 shadow md:px-12 md:py-8">
             <label className="text-gray-500" htmlFor="file">
-              Upload PDF
+              {uploadLabel}
             </label>
             <Dropzone
               multiple={false}
-              accept={{
-                "application/pdf": [".pdf"],
-              }}
-              onDrop={(acceptedFiles) => {
-                const file = acceptedFiles[0];
-                if (file.size > 15 * 1024 * 1024) {
-                  // 10MB in bytes
-                  toast({
-                    title: "📁 File Too Large",
-                    description: "⚠️ File size must be less than 15MB",
-                  });
-                  return;
-                }
-                setFile(file);
-              }}
+              accept={acceptType}
+              onDrop={handleFileDrop}
             >
               {({ getRootProps, getInputProps, isDragAccept }) => (
                 <div
-                  className={`mt-2 flex aspect-video cursor-pointer items-center justify-center rounded-lg border border-dashed bg-gray-100 ${isDragAccept ? "border-blue-500" : "border-gray-250"}`}
+                  className={`mt-2 flex flex-col aspect-video cursor-pointer items-center justify-center rounded-lg border border-dashed bg-gray-100 ${isDragAccept ? "border-blue-500" : "border-gray-250"}`}
                   {...getRootProps()}
                 >
                   <input required={!file} {...getInputProps()} />
                   <div className="text-center">
-                    {file ? (
-                      <p>{file.name}</p>
+                    {file && imagePreviewUrl ? (
+                      <div className="flex flex-col items-center">
+                        <img src={imagePreviewUrl} alt="Preview" className="max-h-40 max-w-full object-contain mb-2"/>
+                        <p className="text-sm text-gray-600 truncate max-w-full px-2">{truncateFilename(file.name)}</p>
+                      </div>
                     ) : (
                       <Button type="button" className="md:text-base">
-                        Select PDF
+                        {selectButtonText}
                       </Button>
                     )}
                   </div>
                 </div>
               )}
             </Dropzone>
-            <label className="mt-8 text-gray-500" htmlFor="language">
-              Language
+            <label className="mt-8 text-gray-500" htmlFor="model">
+              Select Model
             </label>
-            <Select defaultValue="english" name="language">
-              <SelectTrigger className="mt-2 bg-gray-100" id="language">
+            <Select defaultValue="gemini-2.5-flash-preview" name="model">
+              <SelectTrigger className="mt-2 bg-gray-100" id="model">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
                 {[
-                  { label: "English", value: "english" },
-                  { label: "German", value: "german" },
-                  { label: "French", value: "french" },
-                  { label: "Italian", value: "italian" },
-                  { label: "Portuguese", value: "portuguese" },
-                  { label: "Hindi", value: "hindi" },
-                  { label: "Spanish", value: "spanish" },
-                  { label: "Thai", value: "thai" },
-                ].map((language) => (
-                  <SelectItem key={language.value} value={language.value}>
-                    {language.label}
+                  { label: "Gemini 2.5 Flash Preview", value: "gemini-2.5-flash-preview" },
+                  // Add other models here if needed in the future
+                ].map((model) => (
+                  <SelectItem key={model.value} value={model.value}>
+                    {model.label}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -120,7 +173,7 @@ export const HomeLandingDrop = ({
               type="submit"
               variant="secondary"
               className="w-60 border bg-white/80 text-base font-semibold hover:bg-white md:w-auto"
-              disabled={status === "parsing"}
+              disabled={status === "processing" || !file}
             >
               <SparklesIcon />
               Generate

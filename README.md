@@ -1,42 +1,78 @@
-<a href="https://github.com/Nutlope/smartpdfs">
-  <img alt="SmartPDF" src="./public/og.jpg">
-  <h1 align="center">SmartPDF</h1>
-</a>
+# SmartIMGs
 
-<p align="center">
-  Instantly summarize and section your PDFs with AI. Powered by Llama 3.3 on Together AI.
-</p>
+SmartIMGs 是一款基于 Next.js 构建的 AI 驱动应用，专注于提供极简、高效、精准的图片智能描述生成服务。生成的描述文本可直接作为 AI 绘图提示词，助您最大程度还原并重现原始图片的视觉效果与细节。
 
-## Tech stack
+## 📸 预览
 
-- [Together AI](https://togetherai.link) for inference
-- [Llama 3.3](https://togetherai.link/llama-3.3) for the LLM
-- Next.js with Tailwind & TypeScript
-- Prisma ORM with Neon (Postgres)
-- Helicone for observability
-- Plausible for analytics
-- S3 for PDF storage
+![smartimgs-preview](./public/og.jpg)
 
-## Cloning & running
+## ✨ 核心功能
 
-1. Clone the repo: `git clone https://github.com/Nutlope/smartpdfs`
-2. Create a `.env` file and add your environment variables (see `.example.env`):
-   - `TOGETHER_API_KEY=`
-   - `DATABASE_URL=`
-   - `S3_UPLOAD_KEY=`
-   - `S3_UPLOAD_SECRET=`
-   - `S3_UPLOAD_BUCKET=`
-   - `S3_UPLOAD_REGION=us-east-1`
-   - `HELICONE_API_KEY=` (optional, for observability)
-3. Run `pnpm install` to install dependencies
-4. Run `pnpm prisma generate` to generate the Prisma client
-5. Run `pnpm dev` to start the development server
+- 🚀 **一键操作**：上传图片即可自动生成智能描述，简单高效。
+- 🖋️ **精准描述**：利用先进AI模型分析图片内容，生成详细准确的文字描述。
+- 🌍 **先进多模态模型**：采用 Google Gemini 2.5 Flash 多模态模型，描述更准确。
+- 📱 **响应式设计**：适配桌面和移动设备，随时随地使用。
 
-## Roadmap
+## 🛠️ 技术栈
 
-- [ ] Add some rate limiting by IP address
-- [ ] Integrate OCR for image parsing in PDFs
-- [ ] Add a bit more polish (make the link icon nicer) & add a "powered by Together" sign
-- [ ] Implement additional revision steps for improved summaries
-- [ ] Add a demo PDF for new users to be able to see it in action
-- [ ] Add feedback system with thumbs up/down feature
+- **框架**: Next.js 15.3 (App Router)
+- **开发语言**: TypeScript
+- **样式**: Tailwind CSS
+- **AI服务**:
+  - OpenAI SDK
+  - gemini-2.5-flash-preview 模型
+- **交互**:
+  - react-dropzone (图片上传)
+
+## 🚀 快速开始
+
+1. 克隆仓库：
+
+```bash
+git clone https://github.com/jamez-bondos/smartimgs.git
+```
+
+2. 安装依赖：
+
+```bash
+npm install
+```
+
+3. 创建环境变量文件 `.env`：
+
+```
+GEMINI_API_KEY=
+GEMINI_BASE_URL=https://generativelanguage.googleapis.com/v1beta/openai/
+```
+
+获取 Gemini API Key: https://ai.google.dev/gemini-api/docs/api-key
+
+4. 启动开发服务器：
+
+```bash
+npm run dev
+```
+
+## 💡 使用指南
+
+1. 点击或拖拽上传您的图片（支持PNG、JPEG、WEBP格式）。
+2. 选择描述生成模型（默认使用Gemini 2.5 Flash Preview）。
+3. 点击"Generate"按钮开始处理。
+4. 等待系统生成描述。
+5. 查看并利用生成的图片描述。
+
+## 🤝 贡献指南
+
+欢迎贡献！请随时提交 Pull Request。
+
+## 🙏 Credits
+
+本项目参考与借鉴了以下优秀的开源项目和资源：
+
+- 项目结构基于 [@Nutlope/smartpdfs](https://github.com/Nutlope/smartpdfs)
+- 提示词参考：[@dontbesilent12的推文](https://x.com/dontbesilent12/status/1919633554352570511)
+- 项目灵感来源：[@hellokaton/remove-bg](https://github.com/hellokaton/remove-bg)
+
+## 📝 许可证
+
+[MIT](LICENSE)

@@ -6,7 +6,6 @@ import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import Link from "next/link";
-import PlausibleProvider from "next-plausible";
 
 const font = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -15,11 +14,11 @@ const font = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Smart PDFs | Summarize PDFs in seconds",
+  title: "Smart Images | Describe Images in seconds",
   description:
-    "Upload a PDF to get a quick, clear, and shareable summary with AI for free!",
+    "Upload an image to get a quick, clear, and shareable description with AI for free!",
   openGraph: {
-    images: "https://smartpdfs.vercel.app/og.jpg",
+    images: "https://smartimgs.com/og.jpg",
   },
 };
 
@@ -31,7 +30,6 @@ export default function RootLayout({
   return (
     <html lang="en" className="h-full">
       <head>
-        <PlausibleProvider domain="smartpdfs.ai" />
       </head>
       <body
         className={`${font.variable} flex min-h-full flex-col bg-gray-100 font-[family-name:var(--font-plus-jakarta-sans)] text-gray-900 antialiased`}
@@ -46,14 +44,14 @@ export default function RootLayout({
         <Toaster />
         <footer className="mx-auto mt-14 flex w-full max-w-7xl items-center justify-between px-4 py-6 md:mt-0">
           <p className="text-xs text-gray-300 md:text-sm">
-            Powered by Llama 3.3 on{" "}
+            Powered by Gemini 2.5 Flash on{" "}
             <a
               target="_blank"
               rel="noopener noreferrer"
               className="text-gray-400 underline transition hover:text-gray-900"
-              href="https://togetherai.link/"
+              href="https://ai.google.dev/gemini-api/docs"
             >
-              Together AI
+              Google
             </a>
           </p>
 
@@ -62,13 +60,13 @@ export default function RootLayout({
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1 rounded-lg border border-gray-250 bg-white px-2 py-1.5 text-xs text-gray-300 shadow transition hover:bg-white/75 md:rounded-xl md:px-4 md:text-sm"
-              href="https://github.com/nutlope/smartpdfs"
+              href="https://github.com/jamez-bondos/smartimgs"
             >
               <GithubIcon className="size-4" />
               GitHub
             </a>
             <a
-              href="https://x.com/nutlope"
+              href="https://x.com/AIJamezBondos"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1 rounded-lg border border-gray-250 bg-white px-2 py-1.5 text-xs text-gray-300 shadow transition hover:bg-white/75 md:rounded-xl md:px-4 md:text-sm"
