@@ -70,7 +70,7 @@ export async function POST(req: NextRequest) {
     const description = response.choices[0].message.content;
 
     return NextResponse.json({ description });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error in /api/describe-image:", error);
     const errorMessage = 'Google Gemini API request failed.';
     return NextResponse.json(

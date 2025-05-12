@@ -2,7 +2,6 @@
 
 import { Button } from "@/components/ui/button";
 import { FormEvent, useState } from "react";
-import { MenuIcon } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { HomeLandingDrop } from "@/components/HomeLandingDrop";
 import { DescriptionContent } from "@/components/ui/description-content";
@@ -18,7 +17,7 @@ export default function Home() {
     description: string;
   }>();
   const [generatedVisual, setGeneratedVisual] = useState<string>();
-  const [showMobileDetails, setShowMobileDetails] = useState(true);
+  const [showMobileDetails] = useState(true);
   const [errorMesg, setErrorMesg] = useState<string | null>(null);
 
   const { toast } = useToast();
@@ -43,9 +42,7 @@ export default function Home() {
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setErrorMesg(null);
-    const formData = new FormData(e.currentTarget);
-    const model = formData.get("model") as string;
-
+    
     if (!file) {
       toast({
         title: "No image selected",
@@ -91,9 +88,11 @@ export default function Home() {
         throw new Error(result.error || "No description found in API response");
       }
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error generating description:", error);
-      const message = error.message || "An unknown error occurred during generation.";
+      const message = error instanceof Error 
+        ? error.message 
+        : "An unknown error occurred during generation.";
       setErrorMesg(message);
       toast({
         title: "Error Generating Description",
