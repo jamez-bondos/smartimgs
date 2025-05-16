@@ -133,8 +133,10 @@ export const HomeLandingDrop = ({
                   <div className="text-center">
                     {file && imagePreviewUrl ? (
                       <div className="flex flex-col items-center">
-                        <img src={imagePreviewUrl} alt="Preview" className="max-h-40 max-w-full object-contain mb-2"/>
-                        <p className="text-sm text-gray-600 truncate max-w-full px-2">{truncateFilename(file.name)}</p>
+                        <img src={imagePreviewUrl} alt="Preview" className="max-h-40 max-w-full object-contain mb-2 mt-2"/>
+                        <p className="text-sm text-gray-600 truncate max-w-full px-2">
+                          {truncateFilename(file.name)}
+                        </p>
                       </div>
                     ) : (
                       <Button type="button" className="md:text-base">
