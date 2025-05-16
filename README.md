@@ -41,9 +41,18 @@ npm install
 3. 创建环境变量文件 `.env`：
 
 ```
-GEMINI_API_KEY=
+# Google Gemini API Key
+GEMINI_API_KEY= <google ai studio api key>
 GEMINI_BASE_URL=https://generativelanguage.googleapis.com/v1beta/openai/
+GEMINI_MODEL="gemini-2.5-flash-preview-04-17"
+
+# OpenRouter API Key
+# GEMINI_API_KEY= <openrouter api key>
+# GEMINI_BASE_URL=https://openrouter.ai/api/v1
+# GEMINI_MODEL="google/gemini-2.5-flash-preview"
 ```
+
+选择 Google Gemini 或者 OpenRouter 中的一种。
 
 获取 Gemini API Key: https://ai.google.dev/gemini-api/docs/api-key
 
