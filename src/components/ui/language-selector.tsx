@@ -7,7 +7,7 @@ import { Language, languages } from "@/lib/i18n";
 import { Button } from "./button";
 
 export function LanguageSelector() {
-  const { language, setLanguage, t } = useLanguage();
+  const { language, setLanguage } = useLanguage();
   
   // Define languages to cycle through
   const allLanguages = Object.keys(languages) as Language[];
