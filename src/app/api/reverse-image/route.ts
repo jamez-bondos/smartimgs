@@ -7,7 +7,7 @@ const google = new OpenAI({
 });
 const model = process.env.GEMINI_MODEL || "gemini-2.5-flash-preview-04-17";
 
-const prompt = `
+const promptTemplate = `
 Please analyze the attached image in detail. Your task is to generate a highly detailed, precise, and structured text prompt (hereinafter referred to as the 'image prompt'). The sole objective of this image prompt is that when it is input into an advanced image generation AI (e.g., Midjourney, Stable Diffusion, DALL-E, etc.), it enables the AI to regenerate the original image as faithfully and visually similarly as possible.
 
 The image prompt you generate must include, but is not limited to, the following key visual elements:
@@ -21,6 +21,7 @@ The image prompt you generate must include, but is not limited to, the following
 - Image Quality/Medium: If possible, describe the image's texture or quality (e.g., high-definition, cinematic, film grain, blur effect, sharp focus).
 
 Please provide the final generated image prompt as the sole output. Ensure it is a coherent text string suitable for direct copy-pasting into an image generation AI. Do not include any explanations, titles, or additional dialogue; output only the final image prompt itself, optimized for image generation.
+Output language: @{{promptLang}}.
 `;
 
 async function encodeImageToBase64(file: File): Promise<string> {
@@ -34,9 +35,14 @@ export async function POST(req: NextRequest) {
   try {
     const formData = await req.formData();
     const file = formData.get("image") as File | null;
+    let promptLang = formData.get("promptLang") as string;
 
     if (!file) {
       return NextResponse.json({ error: "No image file provided." }, { status: 400 });
+    }
+
+    if (!promptLang) {
+      promptLang = "zh";
     }
 
     const base64Image = await encodeImageToBase64(file);
@@ -44,6 +50,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Failed to encode image to base64." }, { status: 500 });
     }
 
+    const language = promptLang === "zh" ? "中文" : "English";
+    const prompt = promptTemplate.replace("@{{promptLang}}", language);
     const response = await google.chat.completions.create({
       model: model,
       messages: [
@@ -67,11 +75,11 @@ export async function POST(req: NextRequest) {
 
     console.log(JSON.stringify(response, null, 2));
 
-    const description = response.choices[0].message.content;
+    const content = response.choices[0].message.content;
 
-    return NextResponse.json({ description });
+    return NextResponse.json({ prompt: content });
   } catch (error: unknown) {
-    console.error("Error in /api/describe-image:", error);
+    console.error("Error in /api/reverse-image:", error);
     const errorMessage = 'Google Gemini API request failed.';
     return NextResponse.json(
       { error: errorMessage },

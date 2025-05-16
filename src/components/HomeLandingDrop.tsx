@@ -15,6 +15,7 @@ import HomepageImage2 from "./images/homepage-image-2";
 import { StatusApp } from "@/app/page";
 import { useToast } from "@/hooks/use-toast";
 import { useEffect, useState } from "react";
+import { useLanguage } from "@/lib/i18n/language-provider";
 
 // Helper function to truncate filename
 const truncateFilename = (filename: string, maxLength = 25) => {
@@ -45,12 +46,17 @@ export const HomeLandingDrop = ({
   file,
   setFile,
   handleSubmit,
+  promptLang,
+  onPromptLangChange,
 }: {
   status: StatusApp;
   file?: File | null;
   setFile: (file: File | undefined) => void;
   handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
+  promptLang: string;
+  onPromptLangChange: (lang: string) => void;
 }) => {
+  const { t } = useLanguage();
   const { toast } = useToast();
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
 
@@ -59,10 +65,6 @@ export const HomeLandingDrop = ({
     "image/jpeg": [".jpg", ".jpeg"], 
     "image/webp": [".webp"] 
   };
-  const uploadLabel = "Upload Image";
-  const selectButtonText = "Select Image";
-  const headerText = "Describe Images";
-  const subHeaderText = "Upload an <strong>image</strong> to get an AI-generated description.";
 
   useEffect(() => {
     // Cleanup function to revoke the object URL
@@ -100,28 +102,22 @@ export const HomeLandingDrop = ({
   };
 
   return (
-    <div className="mx-auto mt-4 max-w-lg md:mt-10">
-      <h1 className="text-center text-4xl font-bold md:text-5xl">
-        {headerText}
-        <br /> in seconds
-      </h1>
-      <p className="mx-auto mt-6 max-w-md text-balance text-center leading-snug md:text-lg md:leading-snug" dangerouslySetInnerHTML={{ __html: subHeaderText }} />
-
+    <div className="mx-auto max-w-lg">
       <form
         onSubmit={handleSubmit}
-        className="relative mx-auto mt-20 max-w-md px-4 md:mt-16"
+        className="relative mx-auto max-w-md px-4"
       >
-        <div className="pointer-events-none absolute left-[-40px] top-[-185px] flex w-[200px] items-center md:-left-[calc(min(30vw,350px))] md:-top-20 md:w-[390px]">
+        <div className="pointer-events-none absolute left-[-40px] top-[-105px] flex w-[200px] items-center md:-left-[calc(min(30vw,350px))] md:-top-20 md:w-[390px]">
           <HomepageImage1 />
         </div>
-        <div className="pointer-events-none absolute right-[20px] top-[-110px] flex w-[70px] justify-center md:-right-[calc(min(30vw,350px))] md:-top-5 md:w-[390px]">
+        <div className="pointer-events-none absolute right-[20px] top-[-30px] flex w-[70px] justify-center md:-right-[calc(min(30vw,350px))] md:-top-5 md:w-[390px]">
           <HomepageImage2 />
         </div>
 
         <div className="relative">
           <div className="flex flex-col rounded-xl bg-white px-6 py-6 shadow md:px-12 md:py-8">
             <label className="text-gray-500" htmlFor="file">
-              {uploadLabel}
+              {t.fileUpload.dropzone}
             </label>
             <Dropzone
               multiple={false}
@@ -142,29 +138,23 @@ export const HomeLandingDrop = ({
                       </div>
                     ) : (
                       <Button type="button" className="md:text-base">
-                        {selectButtonText}
+                        {t.fileUpload.selectImage}
                       </Button>
                     )}
                   </div>
                 </div>
               )}
             </Dropzone>
-            <label className="mt-8 text-gray-500" htmlFor="model">
-              Select Model
+            <label className="mt-8 text-gray-500" htmlFor="promptLang">
+              {t.fileUpload.promptLangLabel}
             </label>
-            <Select defaultValue="gemini-2.5-flash-preview" name="model">
-              <SelectTrigger className="mt-2 bg-gray-100" id="model">
+            <Select value={promptLang} name="promptLang" onValueChange={onPromptLangChange}>
+              <SelectTrigger className="mt-2 bg-gray-100" id="promptLang">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {[
-                  { label: "Gemini 2.5 Flash Preview", value: "gemini-2.5-flash-preview" },
-                  // Add other models here if needed in the future
-                ].map((model) => (
-                  <SelectItem key={model.value} value={model.value}>
-                    {model.label}
-                  </SelectItem>
-                ))}
+                <SelectItem value="zh">中文</SelectItem>
+                <SelectItem value="en">English</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -176,7 +166,7 @@ export const HomeLandingDrop = ({
               disabled={status === "processing" || !file}
             >
               <SparklesIcon />
-              Generate
+              {t.fileUpload.describe}
             </Button>
           </div>
         </div>

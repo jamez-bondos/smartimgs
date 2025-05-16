@@ -1,6 +1,7 @@
 "use client";
 
-import { CopyIcon } from "lucide-react";
+import { CopyIcon, Loader } from "lucide-react";
+import { useLanguage } from "@/lib/i18n/language-provider";
 
 // Helper function to truncate filename
 const truncateFilename = (filename: string | undefined, maxLength = 25) => {
@@ -27,30 +28,32 @@ const truncateFilename = (filename: string | undefined, maxLength = 25) => {
   return `${nameWithoutExtension.substring(0, charsToKeep)}...${nameWithoutExtension.substring(nameWithoutExtension.length - charsToKeep)}${extension}`;
 };
 
-export function DescriptionContent({
+export function PromptContent({
   title,
-  description,
+  prompt,
   imageUrl,
   fileName,
-  onCopyDescription,
+  onCopyPrompt,
   isLoading,
   errorMessage,
 }: {
   title: string;
-  description: string | null;
+  prompt: string | null;
   imageUrl: string | null;
   fileName?: string;
-  onCopyDescription?: (textToCopy: string) => void;
+  onCopyPrompt?: (textToCopy: string) => void;
   isLoading?: boolean;
   errorMessage?: string | null;
 }) {
+  const { t } = useLanguage();
+  
   const handleCopy = () => {
-    if (description && !isLoading && !errorMessage && onCopyDescription) {
-      onCopyDescription(description);
+    if (prompt && !isLoading && !errorMessage && onCopyPrompt) {
+      onCopyPrompt(prompt);
     }
   };
 
-  const canCopy = !!description && !isLoading && !errorMessage;
+  const canCopy = !!prompt && !isLoading && !errorMessage;
 
   return (
     <div className="flex flex-col md:flex-row gap-8">
@@ -58,14 +61,14 @@ export function DescriptionContent({
         <div className="md:w-1/2 flex-shrink-0 flex flex-col">
           <div className="flex items-center justify-between h-10 mb-2">
             <h3 className="text-lg font-semibold text-gray-900">
-              Image {fileName && <span className="text-gray-500 text-sm ml-1">{truncateFilename(fileName)}</span>}
+              {t.prompt.imagePreview} {fileName && <span className="text-gray-500 text-sm ml-1">{truncateFilename(fileName)}</span>}
             </h3>
           </div>
-          <div className="h-[320px] w-full flex items-center justify-center overflow-hidden border border-gray-200 rounded-md bg-gray-50">
+          <div className="h-[360px] w-full flex items-center justify-center overflow-hidden border border-gray-200 rounded-md bg-gray-50">
             <img
               className="rounded-md object-contain max-h-full max-w-full"
               src={imageUrl}
-              alt={title || "description image"}
+              alt={title}
             />
           </div>
         </div>
@@ -73,13 +76,13 @@ export function DescriptionContent({
       <div className="md:w-1/2">
         <div className="flex items-center justify-between h-10 mb-2">
           <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
-          {onCopyDescription && (
+          {onCopyPrompt && (
             <button
               onClick={handleCopy}
               className={`p-1.5 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-md ${
                 !canCopy ? "opacity-50 cursor-not-allowed" : ""
               }`}
-              aria-label="Copy description"
+              aria-label={t.prompt.copy}
               disabled={!canCopy}
             >
               <CopyIcon size={18} />
@@ -88,26 +91,24 @@ export function DescriptionContent({
         </div>
         <div className="text-base text-left relative">
           <textarea
-            className="w-full h-[320px] px-4 py-3 rounded-md border border-gray-200 focus:outline-none font-sans text-base resize-none bg-gray-50"
-            value={description || ""}
+            className="w-full h-[360px] px-4 py-3 rounded-md border border-gray-200 focus:outline-none font-sans text-base resize-none text-gray-900 bg-gray-50"
+            value={prompt || ""}
             readOnly
             spellCheck="false"
             style={{
               overflowY: 'auto',
               whiteSpace: 'pre-wrap',
-              WebkitTextFillColor: 'inherit', // Ensures the text color remains normal despite being readonly
+              WebkitTextFillColor: 'inherit',
             }}
             onClick={(e) => {
-              // Allow triple click to select all text
               if (e.detail === 3) {
                 (e.target as HTMLTextAreaElement).select();
               }
             }}
           />
-          
           {isLoading && (
-            <div className="absolute inset-0 flex justify-center items-center bg-gray-50/80">
-              <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-blue-500"></div>
+            <div className="absolute inset-0 flex justify-center items-center bg-gray-50">
+              <Loader className="animate-spin text-gray-400 w-8 h-8" />
             </div>
           )}
           
